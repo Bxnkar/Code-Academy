@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <nav>
+        <div class="nav-container">
+            <div class="nav-left">
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{{ url_for('home') }}" class="logo">
+                    <i class="fas fa-terminal"></i>
+                    <span>Code Academy</span>
+                </a>
+            </div>
+            <div class="nav-center">
+                <form action="{{ url_for('home') }}" method="get" class="search-form">
+                    <input type="text" name="search" placeholder="SEARCH_VIDEOS..." class="search-input">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="nav-right">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_superuser %}
+                        <a href="{{ url_for('upload') }}" class="nav-btn">
+                            <i class="fas fa-upload"></i>
+                            <span>UPLOAD</span>
+                        </a>
+                        <a href="{{ url_for('admin_dashboard') }}" class="nav-btn">
+                            <i class="fas fa-cog"></i>
+                            <span>ADMIN</span>
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="nav-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>LOGOUT</span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>LOGIN</span>
+                    </a>
+                    <a href="{{ url_for('register') }}" class="nav-btn">
+                        <i class="fas fa-user-plus"></i>
+                        <span>REGISTER</span>
+                    </a>
+                {% endif %}
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        // Matrix rain effect
+        function createMatrixRain() {
+            const matrixRain = document.getElementById('matrixRain');
+            const characters = '01';
+            const fontSize = 14;
+            const columns = Math.floor(window.innerWidth / fontSize);
+            
+            for (let i = 0; i < columns; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'matrix-drop';
+                drop.style.left = `${i * fontSize}px`;
+                drop.style.animationDelay = `${Math.random() * 2}s`;
+                drop.textContent = characters.charAt(Math.floor(Math.random() * characters.length));
+                matrixRain.appendChild(drop);
+            }
+        }
+
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        function updateThemeIcon(theme) {
+            themeIcon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            createMatrixRain();
+        });
+    </script>
+</body>
+</html> 

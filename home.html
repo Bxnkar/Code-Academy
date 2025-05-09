@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    {% if current_user.is_authenticated %}
+        <div class="video-grid">
+            {% for video in videos %}
+            <div class="video-card">
+                <div class="thumbnail-container">
+                    {% if video.thumbnail_filename %}
+                        <img src="{{ url_for('static', filename='thumbnails/' + video.thumbnail_filename) }}" 
+                             alt="{{ video.title }}" 
+                             class="video-thumbnail">
+                    {% else %}
+                        <div class="no-thumbnail">
+                            <i class="fas fa-video"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="video-info">
+                    <h3>{{ video.title }}</h3>
+                    <div class="video-meta">
+                        <p>Uploaded: {{ video.upload_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    <div class="video-actions">
+                        <a href="{{ url_for('watch_video', video_id=video.id) }}" class="watch-btn">
+                            <i class="fas fa-play"></i>
+                            Watch
+                        </a>
+                        {% if current_user.is_superuser %}
+                        <button type="button" class="delete-btn" data-video-id="{{ video.id }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-videos">
+                <i class="fas fa-video-slash"></i>
+                <p>No videos available yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="auth-message">
+            <h2>Welcome to VideoStream</h2>
+            <p>Please login to access videos</p>
+            <div class="auth-buttons">
+                <a href="{{ url_for('login') }}" class="submit-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </a>
+                <a href="{{ url_for('register') }}" class="submit-btn">
+                    <i class="fas fa-user-plus"></i>
+                    Register
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const videoId = this.getAttribute('data-video-id');
+            if (confirm('Are you sure you want to delete this video?')) {
+                window.location.href = `/delete_video/${videoId}`;
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

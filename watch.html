@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="video-player">
+        <h2>{{ video.title }}</h2>
+        <video controls>
+            <source src="{{ url_for('static', filename='uploads/' + video.filename) }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <p class="upload-date">Uploaded: {{ video.upload_date.strftime('%Y-%m-%d') }}</p>
+        <a href="{{ url_for('home') }}" class="back-btn">Back to Home</a>
+    </div>
+</div>
+{% endblock %} 
